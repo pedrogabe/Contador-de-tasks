@@ -144,7 +144,7 @@
         if(allowed){
             toBeDeleted.parentElement.removeChild(toBeDeleted);
             cantidad--;
-            for(i=1;i<(table.children.length-1);i++){
+            for(i=toBeDeleted.firstChild.innerText;i<(table.children.length-1);i++){
                 table.children[i].firstChild.innerHTML=i;
             }
             document.getElementById("lowClickAudio").currentTime=0;
