@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head><meta http-equiv="cache-control" content="no-cache"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="-1">
+    <style type="text/css">
+        audio{
+            display: none;
+        }
+
+        table{
+            border: 2px solid black;
+        }
+
+        .nav{
+            transition: 0.3s;
+            overflow: hidden;
+            background-color: #359738;
+            top: 0;
+            left: 0;
+            width: 100%;
+            position: fixed
+        }
+
+        .nav button{
+           background-color: #359738;
+            border: none;
+            height: 100%;
+            transition: 0.2s;
+        }
+
+        .nav button:hover{
+            background-color: #1f601b;
+        }
+
+        .r{
+            background-color:red;
+        }
+        .g{
+            background-color:green;
+        }
+        .s{
+           background-color:green
+        }
+
+        .sum button{
+            float: right;
+        }
+
+        .hidden{
+            display:none;
+        }
+    </style>
+    <title>Contador - 301</title>
+</head>
+
+<body>
+    <div class="nav" id="nav" style="height: 0px; min-height: 0px; max-height: 0px;">
+      <button onclick="add('g')">Corta</button>
+      <button onclick="add()">Normal</button>
+      <button onclick="add('r')">Larga</button>
+      <button onclick="add('s')">Submit directo</button>
+      <button style="float:right" onclick="window.scrollTo(0,0);"><strong>↑</strong></button>
+      <button style="float:right" onclick="window.scrollTo(0,document.body.scrollHeight);"><strong>↓</strong></button>
+    </div>
+
+    <table id="table">
+        <tr style="background-color:#95adc8">
+            <th class="main-row">#</th>
+            <th>Hora</th>
+            <th>Comentario</th>
+            <th>
+                <button onclick="add('g')">Corta</button>
+                <button onclick="add()">Normal</button>
+                <button onclick="add('r')">Larga</button>
+                <br>
+                <button onclick="add('s')">Submit directo</button>
+            </th>
+        </tr>
+    </table>
+  <p id="borrador" style="display:none"></p>
+  <audio src="Audios/HighClick.ogg" id="highClickAudio"></audio>
+  <audio src="Audios/LowClick.ogg" id="lowClickAudio"></audio>
+  <audio src="Audios/Trumpets.ogg" id="trumpetsAudio"></audio>
+
+
+<script>
+    const table = document.getElementById("table"), nav = document.getElementById("nav");
+    const highClick = document.getElementById('highClickAudio'), lowClick = document.getElementById('lowClickAudio'), trumpets = document.getElementById('trumpetsAudio');
+    var cantidad = 0;
+    var tasksDisplayed = true;
+
+
+    function add(type){
+        cantidad++;
+        var task = document.createElement('tr');
+        var number = document.createElement('td');
+        number.innerHTML=cantidad;
+        var hora = document.createElement('td'), time=new Date();
+        var strMinutes = time.getMinutes();
+        if(time.getMinutes()<10){
+            strMinutes = "0"+strMinutes;
+        }
+        hora.innerHTML=time.getHours()+":"+strMinutes;
+        var comentario = document.createElement('td');
+        comentario.innerHTML="<input type='text'></input><button onclick='lock(this)'>&#128274;</button><button onclick='unlock(this)'>&#9998;</button>";
+        var deleter = document.createElement('td');
+        deleter.innerHTML="<button onclick='removeTask(this.parentElement.parentElement)'>&#10060;</button>"
+        switch(type){
+            case 'r':task.setAttribute('class',type);task.setAttribute('kind',type);break;
+            case 'g':task.setAttribute('class',type);task.setAttribute('kind',type);break;
+            case 's':task.setAttribute('class',type);task.setAttribute('kind',type);comentario.firstChild.value="Submit directo";break;
+        }
+        if(tasksDisplayed==false){
+            task.className+=' hidden';
+        }
+        task.appendChild(number); task.appendChild(hora); task.appendChild(comentario); task.appendChild(deleter);
+        table.appendChild(task);
+        update();
+        document.getElementById("highClickAudio").currentTime=0;
+        document.getElementById("highClickAudio").play();
+        if((cantidad%100)===0 && cantidad>0){
+            document.getElementById('trumpetsAudio').currentTime=0;
+            document.getElementById('trumpetsAudio').play();
+            deleter.innerHTML+="&#128081";
+        }
+        return true;
+    }
+
+    function lock(callingElement){
+      callingElement.parentElement.firstChild.setAttribute('disabled',true);
+    }
+
+    function unlock(callingElement){
+        callingElement.parentElement.firstChild.removeAttribute('disabled');
+        callingElement.parentElement.firstChild.focus();
+    }
+
+    function removeTask(toBeDeleted){
+        var allowed;
+        if(toBeDeleted.children[2].children[0].getAttribute("disabled")=="true"){
+            allowed = confirm("Estás a punto de eliminar una tarea que bloqueaste. ¿Borrar igual?")
+        }
+        else{allowed=true}
+        if(allowed){
+            toBeDeleted.parentElement.removeChild(toBeDeleted);
+            cantidad--;
+            for(i=1;i<(table.children.length-1);i++){
+                table.children[i].firstChild.innerHTML=i;
+            }
+            document.getElementById("lowClickAudio").currentTime=0;
+            document.getElementById("lowClickAudio").play();
+        }
+        update();
+    }
+
+    var audioOn=true;
+    function toggleAudio(){
+        audioOn = !audioOn;
+        var audios = document.getElementsByTagName("audio");
+        if(audioOn==false){
+            for (i=0; i<audios.length; i++){
+            audios[i].muted=true;
+            }
+            alert("El audio se desactivó");
+        }
+        else{
+    for (i=0; i<audios.length; i++){
+      audios[i].muted=false;
+    }
+    alert("El audio se activó");
+  }
+    }
+
+    function toggleDisplayTasks(){
+        tasksDisplayed = !tasksDisplayed;
+        if(tasksDisplayed){
+            for(i=1; i<(table.children.length-1); i++){
+                table.children[i].className = table.children[i].className.replace(' hidden','');
+            }
+        }else{
+            for(i=1; i<(table.children.length-1); i++){
+                table.children[i].className+=' hidden';
+            }
+        }
+    }
+
+    function saveFile(){
+        var date = new Date();
+        var day;
+        if(cantidad>0){
+            switch(date.getDay()){
+                case 0: day="Domingo"; break;
+                case 1: day="Lunes"; break;
+                case 2: day="Martes"; break;
+                case 3: day="Miércoles"; break;
+                case 4: day="Jueves"; break;
+                case 5: day="Viernes"; break;
+                case 6: day="Sábado"; break;
+            }
+            var text="";
+            text += day+" "+date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()+"\n";
+            text += table.lastElementChild.innerText.replace("\nGuardar",'');
+            text += "\n\n";
+            for(i=1;i<table.children.length-1;i++){
+                var taskComment = table.children[i].children[2].children[0].value;
+                if(taskComment.length>0 && taskComment!="Submit directo"){
+                    text += table.children[i].children[1].innerText;
+                    text += " ~ ";
+                    text += taskComment;
+                    text += "\n";
+                }
+            }
+            text += "\nPrimera tarea entregada a las "+table.children[1].children[1].innerText;
+            text += "\nÚltima tarea entregada a las "+table.children[table.children.length-2].children[1].innerText;
+            var file = new Blob([text], {type:"text/plain"});
+            var url = window.URL.createObjectURL(file);
+            var a = document.createElement('a');
+            a.setAttribute("href",url);
+            a.setAttribute("download", "Tasks "+date.getDate()+" - "+(date.getMonth()+1)+".txt");
+            a.innerHTML="Descargar";
+            a.style="display:none";
+            document.body.appendChild(a);
+            a.click();
+        }
+        else{
+            alert("No hay tareas para guardar");
+        }
+    }
+
+    var sum = document.createElement('tr');
+    function update(){
+        table.appendChild(sum);
+        var r=0,g=0,s=0;
+        for(i=1;i<table.children.length;i++){
+            var t = table.children[i].getAttribute('kind');
+            switch(t){
+                case "r":r++;break;
+                case "g":g++;break;
+                case "s":s++;break;
+            }
+            if(cantidad>0){
+               document.title="Contador - "+cantidad;
+            }
+            else{
+              document.title="Contador";
+            }
+        }
+        sum.innerHTML="<td class=sum colspan=4>Total de tasks:<strong>"+cantidad+"</strong> || Largas:<strong>"+r+"</strong> || Cortas:<strong>"+(g+s)+"</strong> (<strong>"+s+"</strong> submit directo)<button onclick='saveFile()'>Guardar</button></td>";
+        window.scrollTo(0,document.body.scrollHeight);
+    }
+
+    window.addEventListener('scroll', function(){
+        if(window.scrollY>(table.children[0].scrollHeight+table.offsetTop)){
+        nav.style.height="10vh";
+        nav.style.minHeight="15px";
+        nav.style.maxHeight="100px";
+    }
+    else{
+        nav.style.height="0";
+        nav.style.minHeight="0px";
+        nav.style.maxHeight="0px";
+    }
+    })
+
+    window.addEventListener('keydown', function(event){
+        if(document.activeElement.tagName!="INPUT"){
+    switch(event.keyCode){
+      case 189:
+        if(table.children.length>2){
+          removeTask(table.children[table.children.length-2]);
+        }
+        break;
+      case 78:add();break;
+      case 67:add('g');break;
+      case 76:add('r');break;
+      case 83:add('s');break;
+      case 65:toggleAudio();break;
+      case 72:toggleDisplayTasks();break;
+    }
+  }else{
+    switch(event.keyCode){
+      case 27: document.activeElement.blur();break;
+      case 13: lock(document.activeElement);
+    }
+  }
+    });
+
+    window.addEventListener("beforeunload", function(e) {
+        e.returnValue = "";
+        return "";
+    });
+
+
+    var audioRefresh=true; //Para reducir el delay entre que se agrega la tarea y se reproduce el sonido    
+    window.addEventListener("focus",function(){
+        if(audioRefresh){
+            highClick.src='Audios/HighClick.ogg';
+            lowClick.src='Audios/LowClick.ogg';
+            trumpets.src='Audios/Trumpets.ogg';
+        }
+    })
+
+    update();
+</script>
+
+</body>
+</html>
