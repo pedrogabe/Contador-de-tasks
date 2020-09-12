@@ -291,7 +291,7 @@
     });
 
 
-    var audioRefresh=true; //Para reducir el delay entre que se agrega la tarea y se reproduce el sonido    
+    var audioRefresh=true; //Para reducir el delay entre que se agrega la tarea y se reproduce el sonido. Genera problemas al borrar tareas bloqueadas
     window.addEventListener("focus",function(){
         if(audioRefresh){
             highClick.src='Audios/HighClick.ogg';
