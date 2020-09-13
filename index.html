@@ -251,15 +251,15 @@
 
     window.addEventListener('scroll', function(){
         if(window.scrollY>(table.children[0].scrollHeight+table.offsetTop)){
-        nav.style.height="10vh";
-        nav.style.minHeight="15px";
-        nav.style.maxHeight="100px";
-    }
-    else{
-        nav.style.height="0";
-        nav.style.minHeight="0px";
-        nav.style.maxHeight="0px";
-    }
+            nav.style.height="10vh";
+            nav.style.minHeight="25px";
+            nav.style.maxHeight="100px";
+        }
+        else{
+            nav.style.height="0";
+            nav.style.minHeight="0px";
+            nav.style.maxHeight="0px";
+        }
     })
 
     window.addEventListener('keydown', function(event){
